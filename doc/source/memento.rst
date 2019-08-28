@@ -1,14 +1,14 @@
 Memento
 =======
 
-Some example, come from the bloks test
+Some examples can be found into bloks test
 
 .. note:: 
 
-    The authentification will be not explain here, because the authentification 
-    and authorization come from **anyblok_pyramid**
+    The authentification will not be explained here, because the authentification 
+    and authorization are used for **anyblok_pyramid**
 
-    For the authorization the name of the resource is defined by the attribute
+    For the authorization, the name of the resource is defined by the attribute
     ``resource_name`` or ``model``
 
 The querystring
@@ -16,18 +16,20 @@ The querystring
 
 The querystring of the url is parsed by the validator
 
+example:
 ::
 
-    /my/path?filter[fieldname][ilike]=something
+    /my/path?filter[fieldname][ilike]=something&order_by[asc]=fieldname&offset=0&limit=20
 
 the element in the query string are:
 
 * ``offset=0``: add an offset in the query
 * ``limit=20``: limit the result
+* ``order_by[asc]=fieldname``: order the results asc or desc by the fieldname given
 * ``filter[fieldname][operator]=value``: the filters are seen with an **AND** condition between them
   
-  * ``fieldname``: name of the field, is also been a path of relation ship: **name1.name2**
-  * ``operator``: operator of the confition
+  * ``fieldname``: name of the model field or name of a relationship field: **name1.name2**
+  * ``operator``: operator of the condition
 
     * **eq**
     * **like**
@@ -48,27 +50,27 @@ the element in the query string are:
         
         for **in** and **or-..** the value is a string with **,** to separate the values
 
-* ``~filter[fieldname][operator]=value``: the **~** mean **not**
+* ``~filter[fieldname][operator]=value``: the **~** means **not**
 * ``context[key]=value``: add context for some filter
 
   .. note::
 
-        the context is use with an **adater**
+        the context is used with an **adapter**
 
-* ``tag=value``: add a speficic filter
-
-  .. note::
-
-        the tag is use with an **adater**
-
-* ``tags=value1,value2,...``: add the speficics filters
+* ``tag=value``: name one tag function defined in the Adapter to filter the query with
 
   .. note::
 
-        the tags is use with an **adater**
+        the tag is used with an **adapter**
+
+* ``tags=value1,value2,...``: list of the tag's function names to filter the query with
+
+  .. note::
+
+        the tags are used with an **adapter**
 
 
-Create simple CRUD resource
+Create a simple CRUD resource
 ---------------------------
 
 Exemple model::
@@ -93,14 +95,14 @@ CRUD resource based on the example model::
         model = 'Model.Example'
 
 
-This exemple create a CRUD based on the paths:
+This example creates a CRUD based on the following paths:
 
 * **/examples**: The collection path
 
   * post: The body waiting a list of element to create
-  * get: Return a list of element filtered by the querystring
-  * put: Replace all element in the list by new values
-  * patch: Update all element in list
+  * get: Return a list of elements filtered by the querystring
+  * put: Replace all elements in the list by new values
+  * patch: Update all elements in list
   * delete: Delete the elements in the list
 
 * **/examples/{id}**: element path: here id is the primary key of example
@@ -112,9 +114,9 @@ This exemple create a CRUD based on the paths:
 
 the serialization and deserialization of the request is done by 
 `AnyBlok Marshmallow <http://doc.anyblok-marshmallow.anyblok.org/>`_.
-The schema is auto generated in function of the Model
+The schema is auto generated based on the Model
 
-Create CRUD with complex schema
+Create a CRUD with complex schema
 -------------------------------
 
 Address models::
@@ -199,7 +201,7 @@ Schema::
     
         class Schema:
             # follow the relationship One2Many and Many2Many
-            # - the many=True is required because it is *2Many
+            # - many=True is required because it is Many2Many or One2Many
             # - exclude is used to forbid the recurse loop
             addresses = Nested(AddressSchema, many=True, exclude=('customer', ))
             tags = Nested(TagSchema, many=True)
@@ -210,7 +212,7 @@ Schema::
                 if unknown:
                     raise ValidationError('Unknown field', unknown)
 
-CRUD resource based on the address model and the schema::
+CRUD resource based on the address model and on the schema::
 
     from anyblok_pyramid_rest_api.crud_resource import (
         CrudResource, resource)
